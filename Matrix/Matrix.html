@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Effect</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    <script>
+        const canvas = document.getElementById("matrix-canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const fontSize = 20;
+        const columnCount = Math.floor(canvas.width / (fontSize * 0.6));
+        const cascadeCount = 5; // Imposta il numero di cascate desiderate
+        const speedMultiplier = 2;
+        const cascades = [];
+
+        for (let j = 0; j < cascadeCount; j++) {
+            const columns = [];
+
+            for (let i = 0; i < columnCount; i++) {
+                columns[i] = {
+                    text: "",
+                    x: i * fontSize * 0.6,
+                    y: -(Math.random() * canvas.height) - (j * fontSize * 4),
+                    speed: (Math.random() * 2 + 1) * speedMultiplier
+                };
+            }
+
+            cascades.push(columns);
+        }
+
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#0F0"; // Colore verde
+            ctx.font = `${fontSize}px monospace`;
+
+            cascades.forEach(columns => {
+                columns.forEach(column => {
+                    column.text = characters[Math.floor(Math.random() * characters.length)];
+
+                    if (column.y > canvas.height && Math.random() > 0.975) {
+                        column.y = -(fontSize);
+                    }
+
+                    column.y += column.speed;
+                    ctx.fillText(column.text, column.x, column.y);
+                });
+            });
+
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // Ricalcola le colonne per ogni cascata
+            cascades.forEach(columns => {
+                columns.length = Math.floor(canvas.width / (fontSize * 0.6));
+            });
+        });
+
+        draw();
+    </script>
+</body>
+</html>
